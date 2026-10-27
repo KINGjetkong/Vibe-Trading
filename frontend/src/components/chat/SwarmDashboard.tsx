@@ -118,6 +118,38 @@ function StatusPill({
   );
 }
 
+function personaHue(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h % 360;
+}
+
+function personaInitials(agent: SwarmAgentStatus): string {
+  const words = (agent.role || agent.agentId || "?")
+    .split(/[\s_\-]+/)
+    .filter(Boolean);
+  const letters = words.length > 1 ? words[0][0] + words[1][0] : words[0].slice(0, 2);
+  return letters.toUpperCase();
+}
+
+function PersonaBadge({ agent, size }: { agent: SwarmAgentStatus; size: number }) {
+  const hue = personaHue(agent.agentId || agent.role || "");
+  return (
+    <span
+      aria-hidden="true"
+      className="inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white"
+      style={{
+        width: size,
+        height: size,
+        fontSize: Math.round(size * 0.4),
+        background: `linear-gradient(135deg, hsl(${hue} 70% 50%), hsl(${(hue + 40) % 360} 70% 40%))`,
+      }}
+    >
+      {personaInitials(agent)}
+    </span>
+  );
+}
+
 function agentKey(agent: SwarmAgentStatus): string {
   return agent.taskId || agent.agentId;
 }
@@ -173,8 +205,9 @@ function WideAgentRow({
       role="row"
     >
       <div className="min-w-0" role="cell">
-        <div className="truncate font-medium text-foreground">
-          {agent.agentId}
+        <div className="flex min-w-0 items-center gap-1.5 font-medium text-foreground">
+          <PersonaBadge agent={agent} size={20} />
+          <span className="truncate">{agent.agentId}</span>
         </div>
         {agent.role && (
           <div className="truncate text-[10px] text-muted-foreground">
@@ -248,8 +281,9 @@ function NarrowAgentCard({
     >
       <div className="flex min-w-0 items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="truncate text-xs font-medium text-foreground">
-            {agent.agentId}
+          <div className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-foreground">
+            <PersonaBadge agent={agent} size={20} />
+            <span className="truncate">{agent.agentId}</span>
           </div>
           {agent.role && (
             <div className="truncate text-[10px] text-muted-foreground">
