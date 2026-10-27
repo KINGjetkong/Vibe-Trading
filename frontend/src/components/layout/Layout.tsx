@@ -7,7 +7,6 @@ import { useDarkMode } from "@/hooks/useDarkMode";
 import { api, type SessionItem } from "@/lib/api";
 import { safeGet, safeSet } from "@/lib/storage";
 import { useAgentStore } from "@/stores/agent";
-import { BrandMark } from "@/components/common/BrandMark";
 import { ConnectionBanner } from "@/components/layout/ConnectionBanner";
 import { SUPPORTED_LANGUAGES } from "@/i18n";
 import i18n from "@/i18n";
@@ -161,12 +160,12 @@ export function Layout() {
         <div className={cn("border-b border-border/60", collapsed ? "p-2 flex justify-center" : "p-4 max-md:p-2 max-md:flex max-md:justify-center")}>
           <Link
             to="/"
-            aria-label="Vibe-Trading"
+            aria-label="MadTrader · MADX SIGMA6"
             className={cn("flex items-center", collapsed ? "justify-center" : "gap-2 max-md:justify-center")}
           >
-            <BrandMark className="h-6 w-6 shrink-0" />
+            <img className="h-6 w-6 shrink-0" src="http://127.0.0.1:7790/_madx/madx-mark.svg" alt="" />
             {!collapsed && (
-              <span className="text-[15px] font-semibold tracking-tight max-md:hidden">Vibe-Trading</span>
+              <span className="text-[15px] font-semibold tracking-tight max-md:hidden">MadTrader · MADX SIGMA6</span>
             )}
           </Link>
         </div>
@@ -311,7 +310,7 @@ export function Layout() {
         <div className={cn("mt-auto border-t border-border/60", collapsed ? "p-1 flex flex-col items-center gap-1" : "p-3 space-y-2 max-md:p-1 max-md:flex max-md:flex-col max-md:items-center max-md:gap-1 max-md:space-y-0")}>
           {collapsed ? (
             <>
-              <button onClick={toggle} className="p-1.5 text-muted-foreground hover:text-foreground rounded transition-colors" title={dark ? t('layout.light') : t('layout.dark')}>
+              <button onClick={toggle} aria-label={dark ? t('layout.light') : t('layout.dark')} className="flex min-h-11 min-w-11 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground" title={dark ? t('layout.light') : t('layout.dark')}>
                 {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
               </button>
               <button onClick={() => setCollapsed(false)} className="p-1.5 text-muted-foreground hover:text-foreground rounded transition-colors" title={t('layout.expand')}>
@@ -324,7 +323,8 @@ export function Layout() {
               <div className="flex items-center justify-between max-md:flex-col">
                 <button
                   onClick={toggle}
-                  className="flex items-center gap-1.5 p-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={dark ? t('layout.light') : t('layout.dark')}
+                  className="flex min-h-11 min-w-11 items-center gap-1.5 rounded p-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
                   <span className="max-md:hidden">{dark ? t('layout.light') : t('layout.dark')}</span>

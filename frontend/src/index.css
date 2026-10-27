@@ -4,28 +4,30 @@
 
 @layer base {
   :root {
-    /* Light mode surfaces */
-    --background: 220 20% 98%;
-    --foreground: 220 20% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    color-scheme: light;
+    --font-display: Anton, Oswald, Impact, "Arial Narrow", sans-serif;
+    --background: 60 14.2857% 98.6275%;
+    --foreground: 30 7.6923% 10.1961%;
+    --card: 60 6.6667% 97.0588%;
+    --card-foreground: 30 7.6923% 10.1961%;
 
     /* Popover: a slightly elevated surface used for floating menus,
        tooltips, and the language switcher dropdown. Falls back to a
        solid white (light) or surface-1 (dark) so dropdowns never
        appear transparent and let underlying content bleed through. */
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
+    --popover: 60 6.6667% 97.0588%;
+    --popover-foreground: 30 7.6923% 10.1961%;
 
     /* Brand accent */
-    --primary: 27 90% 52%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 16.7718 100% 50.1961%;
+    --primary-foreground: 30 7.6923% 10.1961%;
+    --primary-hover: 16.875 100% 43.9216%;
 
-    --muted: 220 14% 92%;
-    --muted-foreground: 220 14% 46%;
+    --muted: 60 7.6923% 94.902%;
+    --muted-foreground: 30 3% 34%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 14% 87%;
+    --border: 45 8% 90.1961%;
     --radius: 0.5rem;
 
     /* Semantic colors */
@@ -35,33 +37,32 @@
     --info: 217 91% 60%;
 
     /* Chart tokens */
-    --chart-grid: 220 14% 90%;
-    --chart-text: 220 14% 46%;
-    --chart-axis: 220 14% 80%;
+    --chart-grid: 45 8% 90%;
+    --chart-text: 30 3% 34%;
+    --chart-axis: 45 8% 80%;
     --chart-compare-a: #3b82f6;
     --chart-compare-b: #f59e0b;
   }
 
   .dark {
-    /* Dark mode: 4-level surface system. Keep >=5 lightness points between
-       adjacent surfaces — smaller deltas are indistinguishable on most
-       panels (sidebar vs main blended at 5%/8%). */
-    --background: 220 20% 5%;       /* bg-base */
-    --foreground: 220 10% 93%;
-    --card: 220 18% 10%;            /* surface-1 */
-    --card-foreground: 220 10% 93%;
+    color-scheme: dark;
+    --background: 240 4.7619% 4.1176%;
+    --foreground: 60 7.6923% 94.902%;
+    --card: 240 5.2632% 7.451%;
+    --card-foreground: 60 7.6923% 94.902%;
 
-    --popover: 220 18% 12%;         /* surface-1.5 (slightly lighter than card) */
-    --popover-foreground: 220 10% 93%;
+    --popover: 240 5.2632% 7.451%;
+    --popover-foreground: 60 7.6923% 94.902%;
 
-    --primary: 27 90% 52%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 16.7718 100% 50.1961%;
+    --primary-foreground: 30 7.6923% 10.1961%;
+    --primary-hover: 17.8301 100% 58.4314%;
 
-    --muted: 220 16% 16%;           /* surface-2 */
-    --muted-foreground: 220 10% 64%;
+    --muted: 240 5.4545% 10.7843%;
+    --muted-foreground: 30 2% 67%;
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 14% 24%;          /* surface-3 */
+    --border: 240 5% 15.6863%;
 
     /* Semantic colors */
     --success: 142 71% 45%;
@@ -70,15 +71,16 @@
     --info: 217 91% 60%;
 
     /* Chart tokens */
-    --chart-grid: 220 20% 14%;
-    --chart-text: 220 10% 55%;
-    --chart-axis: 220 20% 26%;
+    --chart-grid: 240 5.4545% 10.7843%;
+    --chart-text: 30 2% 67%;
+    --chart-axis: 240 5% 26%;
     --chart-compare-a: #60a5fa;
     --chart-compare-b: #fbbf24;
   }
 
   * { @apply border-border; }
   body { @apply bg-background text-foreground; }
+  h1, h2, h3 { font-family: var(--font-display); }
 
   /* Prose table enhancements */
   .prose table { border-collapse: collapse; width: 100%; }
