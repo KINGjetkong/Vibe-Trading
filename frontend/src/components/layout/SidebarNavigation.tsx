@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { isNavigationActive, NAVIGATION_GROUPS } from "./navigation";
 
-export function SidebarNavigation({ collapsed }: { collapsed: boolean }) {
+export function SidebarNavigation({ collapsed, drawer = false, onNavigate }: { collapsed: boolean; drawer?: boolean; onNavigate?: () => void }) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -47,9 +47,12 @@ export function SidebarNavigation({ collapsed }: { collapsed: boolean }) {
           return (
             <Link key={to} to={to} aria-label={label} aria-current={active ? "page" : undefined}
               title={`${label} — ${t(`navigation.descriptions.${itemId}`)}`}
-              onClick={() => setMenuOpen(false)}
+              onClick={() => {
+                setMenuOpen(false);
+                onNavigate?.();
+              }}
               className={cn("flex items-center rounded-md text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
-                compact ? "justify-center px-2 py-1.5" : "gap-3 px-3 py-1.5",
+                drawer ? "min-h-11 gap-3 px-3 py-2.5" : compact ? "justify-center px-2 py-1.5" : "gap-3 px-3 py-1.5",
                 !compact && !drawer && "max-md:justify-center max-md:px-2",
                 active ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground")}
             >
@@ -65,13 +68,13 @@ export function SidebarNavigation({ collapsed }: { collapsed: boolean }) {
   return (
     <>
       <nav aria-label={t("layout.mainNavigation")}
-        className={cn("max-h-[60vh] shrink-0 overflow-y-auto space-y-3", collapsed ? "p-1" : "p-2 max-md:p-1")}
+        className={cn(drawer ? "min-h-0 flex-1 overflow-y-auto space-y-3 p-3" : "max-h-[60vh] shrink-0 overflow-y-auto space-y-3", !drawer && (collapsed ? "p-1" : "p-2 max-md:p-1"))}
       >
-        <button ref={triggerRef} type="button" aria-label={t("navigation.menu")} title={t("navigation.menu")}
+        {!drawer && <button ref={triggerRef} type="button" aria-label={t("navigation.menu")} title={t("navigation.menu")}
           aria-expanded={menuOpen} aria-controls="sidebar-feature-menu" onClick={() => setMenuOpen((open) => !open)}
           className={cn("flex w-full justify-center rounded-md border border-border/60 p-2 text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40", !collapsed && "md:hidden")}
-        ><Menu className="h-4 w-4" aria-hidden="true" /></button>
-        {groups(collapsed)}
+        ><Menu className="h-4 w-4" aria-hidden="true" /></button>}
+        {groups(drawer ? false : collapsed, drawer)}
       </nav>
       {menuOpen && (
         <nav ref={panelRef} id="sidebar-feature-menu" aria-label={t("navigation.menu")}

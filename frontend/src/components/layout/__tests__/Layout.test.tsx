@@ -5,6 +5,10 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 
 vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
+vi.mock("@/lib/feedHealth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/feedHealth")>();
+  return { ...actual, useFeedHealth: () => ({ data: null, error: true }) };
+});
 
 const sessions = [
   {
@@ -100,10 +104,12 @@ describe("Layout accessibility", () => {
   it("labels landmarks, brand, main content, and the new-chat affordance", () => {
     renderLayout();
 
-    expect(screen.getByRole("complementary", { name: "Vibe-Trading sidebar" })).toHaveClass("max-md:w-12");
+    expect(screen.getByRole("complementary", { name: "Vibe-Trading sidebar" })).toHaveClass("max-md:hidden");
     expect(screen.getByRole("navigation", { name: "Main navigation" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Vibe-Trading" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "New Chat" })).toHaveAttribute("title", "New Chat");
+    expect(screen.getByRole("link", { name: "MadTrader · MADX SIGMA6" })).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: "New Chat" }).find((link) => link.getAttribute("title") === "New Chat"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Skip to main content")).toHaveAttribute("href", "#main");
     expect(screen.getByRole("main")).toHaveAttribute("id", "main");
     expect(screen.getByRole("main").parentElement).toHaveClass("relative");
@@ -114,6 +120,33 @@ describe("Layout accessibility", () => {
     // excess then gets hard-clipped by the parent's overflow-hidden with no
     // scrollbar at all, rather than scrolling into view.
     expect(screen.getByRole("main")).toHaveClass("flex-1", "min-h-0", "overflow-auto");
+  });
+
+  it("opens the phone drawer, traps focus, closes with Escape, and keeps the rail hidden", () => {
+    const { container } = renderLayout();
+    const rail = screen.getByRole("complementary", { name: "Vibe-Trading sidebar" });
+    const menu = container.querySelector<HTMLButtonElement>(".madx-phone-appbar button");
+    expect(rail).toHaveClass("max-md:hidden");
+    expect(menu).not.toBeNull();
+
+    fireEvent.click(menu!);
+    const drawer = screen.getByRole("dialog", { name: "Vibe-Trading sidebar" });
+    expect(drawer).toBeInTheDocument();
+    const focusable = drawer.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    expect(focusable[0]).toHaveFocus();
+    fireEvent.keyDown(focusable[0], { key: "Tab", shiftKey: true });
+    expect(focusable[focusable.length - 1]).toHaveFocus();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Vibe-Trading sidebar" })).not.toBeInTheDocument();
+    expect(menu).toHaveFocus();
+  });
+
+  it("closes the phone drawer when its scrim is clicked", () => {
+    const { container } = renderLayout();
+    fireEvent.click(container.querySelector<HTMLButtonElement>(".madx-phone-appbar button")!);
+    expect(screen.getByRole("dialog", { name: "Vibe-Trading sidebar" })).toBeInTheDocument();
+    fireEvent.click(container.querySelector<HTMLButtonElement>(".madx-phone-scrim > button")!);
+    expect(screen.queryByRole("dialog", { name: "Vibe-Trading sidebar" })).not.toBeInTheDocument();
   });
 
   it("exposes session actions on keyboard focus and labels the rename input", async () => {
@@ -218,12 +251,12 @@ describe("Layout accessibility", () => {
     window.localStorage.setItem("qa-sidebar", "collapsed");
     renderLayout();
     const trigger = screen.getByRole("button", { name: "Sessions" });
-    expect(screen.queryByRole("link", { name: "New Chat" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "New Chat" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Language" })).toBeInTheDocument();
     fireEvent.click(trigger);
     expect(trigger).toHaveAttribute("aria-expanded", "true");
     expect(await screen.findByText(sessions[0].title)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "New Chat" })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "New Chat" })).toHaveLength(2);
     fireEvent.keyDown(document, { key: "Escape" });
     expect(trigger).toHaveAttribute("aria-expanded", "false");
     expect(trigger).toHaveFocus();

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useSearchParams } from "react-router";
-import { Check, ChevronDown, Languages, Moon, Sun, Plus, Trash2, Pencil, MessageSquare, ChevronsLeft, ChevronsRight, Loader2, X } from "lucide-react";
+import { Check, ChevronDown, Languages, Moon, Sun, Plus, Trash2, Pencil, MessageSquare, ChevronsLeft, ChevronsRight, Loader2, X, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { api, type SessionItem } from "@/lib/api";
@@ -13,6 +13,8 @@ import i18n from "@/i18n";
 import { toast } from "sonner";
 import { SidebarNavigation } from "./SidebarNavigation";
 import { PageHelp } from "./PageHelp";
+import { FeedHealthContext, useFeedHealth } from "@/lib/feedHealth";
+import { FeedHealthPill } from "@/components/chat/FeedHealthPill";
 
 // APP_VERSION is sourced from i18n locale files (app.version key) to keep a
 // single source of truth across the footer and every localised README.
@@ -21,8 +23,10 @@ export function Layout() {
   const { t } = useTranslation();
 
   const { pathname } = useLocation();
+  const isAgentPage = pathname === "/" || pathname.startsWith("/agent");
   const [searchParams] = useSearchParams();
   const { dark, toggle } = useDarkMode();
+  const feedHealth = useFeedHealth(isAgentPage);
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [sessionsError, setSessionsError] = useState<string | null>(null);
@@ -34,9 +38,52 @@ export function Layout() {
   const [sessionsOpen, setSessionsOpen] = useState(false);
   const sessionsPanelRef = useRef<HTMLDivElement>(null);
   const sessionsTriggerRef = useRef<HTMLButtonElement>(null);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const mobileDrawerRef = useRef<HTMLElement>(null);
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
 
   const activeSessionId = searchParams.get("session");
   const streamingSessionId = useAgentStore(s => s.streamingSessionId);
+  const pageTitle = sessions.find((session) => session.session_id === activeSessionId)?.title || t("layout.agent");
+
+  useEffect(() => {
+    setMobileDrawerOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileDrawerOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusable = () => mobileDrawerRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    focusable()?.[0]?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMobileDrawerOpen(false);
+        mobileMenuButtonRef.current?.focus();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = Array.from(focusable() ?? []);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [mobileDrawerOpen]);
 
   useEffect(() => {
     if (!sessionsOpen) return;
@@ -92,7 +139,6 @@ export function Layout() {
 
   // Load sessions on mount. Also refresh when navigating TO /agent or when
   // the active session changes (covers new session creation from Agent).
-  const isAgentPage = pathname === "/" || pathname.startsWith("/agent");
   useEffect(() => {
     loadSessions();
     return () => { sessionsLoadGeneration.current += 1; };
@@ -141,7 +187,8 @@ export function Layout() {
   };
 
   return (
-    <div className="flex h-screen bg-background rtl:flex-row-reverse">
+    <FeedHealthContext.Provider value={feedHealth}>
+    <div className="flex h-screen max-md:h-[100dvh] bg-background rtl:flex-row-reverse">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[70] focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
@@ -152,7 +199,7 @@ export function Layout() {
       <aside
         aria-label={t('layout.sidebar', { defaultValue: 'Vibe-Trading sidebar' })}
         className={cn(
-          "madx-duo-sidebar max-md:w-12 border-e border-border/60 bg-card flex flex-col shrink-0 transition-all duration-200 overflow-visible",
+          "madx-duo-sidebar max-md:hidden border-e border-border/60 bg-card flex flex-col shrink-0 transition-all duration-200 overflow-visible",
           collapsed ? "w-12" : "w-64"
         )}
       >
@@ -358,6 +405,27 @@ export function Layout() {
 
       {/* Main */}
       <div className="relative flex-1 flex flex-col overflow-hidden">
+        <header className="madx-phone-appbar md:hidden z-20 flex h-[calc(3.5rem+env(safe-area-inset-top))] shrink-0 items-end border-b border-border/60 bg-background/95 px-2 pb-1.5 pt-[env(safe-area-inset-top)] backdrop-blur">
+          <button
+            ref={mobileMenuButtonRef}
+            type="button"
+            aria-label={t("navigation.menu")}
+            aria-expanded={mobileDrawerOpen}
+            aria-controls="madx-phone-drawer"
+            onClick={() => setMobileDrawerOpen(true)}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
+          >
+            <Menu className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <span className="min-w-0 flex-1 truncate px-2 text-center text-sm font-medium text-foreground">{pageTitle}</span>
+          <Link
+            to="/agent"
+            aria-label={t("layout.newChat")}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
+          >
+            <Plus className="h-5 w-5" aria-hidden="true" />
+          </Link>
+        </header>
         {sessionsError ? (
           <div role="alert" className="flex flex-wrap items-center gap-2 border-b border-warning/30 bg-warning/10 px-4 py-2 text-xs">
             <span className="font-medium">{t("layout.sessionsLoadFailed")}</span>
@@ -373,7 +441,35 @@ export function Layout() {
           <Outlet />
         </main>
       </div>
+      {mobileDrawerOpen && (
+        <div className="madx-phone-scrim fixed inset-0 z-[60] md:hidden">
+          <button
+            type="button"
+            aria-label={t("navigation.close")}
+            className="absolute inset-0 h-full w-full bg-black/40"
+            onClick={() => setMobileDrawerOpen(false)}
+          />
+          <aside
+            ref={mobileDrawerRef}
+            id="madx-phone-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("layout.sidebar")}
+            className="madx-phone-drawer absolute inset-y-0 start-0 flex w-[min(20rem,calc(100vw-2rem))] flex-col border-e border-border bg-card pt-[env(safe-area-inset-top)] shadow-xl"
+          >
+            <div className="flex min-h-14 items-center justify-between border-b border-border/60 px-4">
+              <span className="font-medium text-foreground">{t("layout.sidebar")}</span>
+              <button type="button" aria-label={t("navigation.close")} onClick={() => setMobileDrawerOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground hover:bg-muted">
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+            <div className="border-b border-border/60 px-4 py-3"><FeedHealthPill /></div>
+            <SidebarNavigation collapsed={false} drawer onNavigate={() => setMobileDrawerOpen(false)} />
+          </aside>
+        </div>
+      )}
     </div>
+    </FeedHealthContext.Provider>
   );
 }
 

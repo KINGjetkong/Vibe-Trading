@@ -29,7 +29,7 @@ export function ProviderBadge({ provider, feed }: Props) {
       role="img"
       aria-label={label}
       title={label}
-      className={`relative inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-md text-[8px] font-bold leading-none text-white ring-1 ring-white/90 shadow-sm ${provider.color}`}
+      className={`relative inline-flex h-4 w-4 shrink-0 align-middle items-center justify-center rounded-md text-[8px] font-bold leading-none text-white ring-1 ring-white/90 shadow-sm ${provider.color}`}
     >
       {provider.family.slice(0, 2).toUpperCase()}
       {feed && (

@@ -49,7 +49,6 @@ import {
   stopSwarmRun,
 } from "@/lib/swarmStatus";
 import { buildToolTimelineMessages } from "@/pages/agentToolTimeline";
-import { FeedHealthContext, useFeedHealth } from "@/lib/feedHealth";
 
 /* ---------- Message grouping ---------- */
 type MsgGroup =
@@ -233,7 +232,6 @@ function goalContinuePrompt(snapshot: GoalSnapshot): string {
 /* ---------- Component ---------- */
 export function Agent() {
   const { t } = useTranslation();
-  const feedHealth = useFeedHealth();
   const [searchParams, setSearchParams] = useSearchParams();
   const listRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<ComposerHandle>(null);
@@ -1814,7 +1812,6 @@ export function Agent() {
     : null;
 
   return (
-    <FeedHealthContext.Provider value={feedHealth}>
     <div className="flex flex-col flex-1 min-w-0 overflow-hidden h-full">
       <ModelRuntimeBar
         settings={llmSettings}
@@ -1990,7 +1987,7 @@ export function Agent() {
 
       <div
         data-agent-composer
-        className="border-t p-4 bg-background/80 backdrop-blur-sm"
+        className="madx-phone-composer border-t p-4 bg-background/80 backdrop-blur-sm max-md:pb-[calc(1rem+env(safe-area-inset-bottom))]"
       >
         <div className="max-w-3xl mx-auto">
           <LiveRuntimePanel
@@ -2032,6 +2029,5 @@ export function Agent() {
         </div>
       </div>
     </div>
-    </FeedHealthContext.Provider>
   );
 }

@@ -1,5 +1,5 @@
 import i18n from '@/i18n';
-import { Component, lazy, memo, Suspense, useState, useCallback, type ReactNode } from "react";
+import { Component, lazy, memo, Suspense, useState, useCallback, useContext, type HTMLAttributes, type ReactNode } from "react";
 import { XCircle, RefreshCw, Copy, Check, Paperclip, Users, Target, Clock3 } from "lucide-react";
 import ReactMarkdown, { type Options as ReactMarkdownOptions } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -11,6 +11,9 @@ import type { AgentMessage } from "@/types/agent";
 import type { StoredAgentMessage } from "@/stores/agent";
 import { AgentAvatar } from "./AgentAvatar";
 import { RunCompleteCard } from "./RunCompleteCard";
+import { FeedHealthContext } from "@/lib/feedHealth";
+import { providerForInlineCodeToken } from "@/lib/toolProviders";
+import { ProviderBadge } from "./ProviderBadge";
 
 // singleDollarTextMath off: dollar amounts ("$150 to $120") must never parse as
 // formulas; LLM \(...\)/\[...\] delimiters are normalized to $$ before render.
@@ -43,7 +46,35 @@ const markdownComponents: ReactMarkdownOptions["components"] = {
     }
     return <a {...props} target="_blank" rel="noopener noreferrer" />;
   },
+  code: ({ node, className, children, ...props }) => {
+    void node;
+    const token = String(children ?? "");
+    const inline = !className && !token.endsWith("\n") && !token.includes("\n");
+    return <InlineCodeBadge token={token} inline={inline} className={className} {...props}>{children}</InlineCodeBadge>;
+  },
 };
+
+function InlineCodeBadge({
+  token,
+  inline,
+  className,
+  children,
+  ...props
+}: HTMLAttributes<HTMLElement> & {
+  token: string;
+  inline: boolean;
+  children?: ReactNode;
+}) {
+  const feedHealth = useContext(FeedHealthContext);
+  const provider = inline ? providerForInlineCodeToken(token, feedHealth.data?.feeds ?? []) : null;
+  const feed = provider ? feedHealth.data?.feeds.find((item) => item.id === provider.id) : undefined;
+  return (
+    <code className={className} {...props}>
+      {provider && <ProviderBadge provider={provider} feed={feed} />}
+      {children}
+    </code>
+  );
+}
 const proseClassName = "prose prose-sm dark:prose-invert max-w-none text-[15px] leading-relaxed prose-p:font-serif prose-p:text-[15.5px] prose-p:leading-[1.75] prose-li:font-serif prose-li:text-[15.5px] prose-li:leading-[1.75] prose-headings:font-sans prose-table:font-sans prose-code:font-mono prose-blockquote:font-sans [&_blockquote_p]:font-sans prose-table:border prose-table:border-border/50 prose-th:bg-muted/30 prose-th:px-3 prose-th:py-1.5 prose-td:px-3 prose-td:py-1.5 prose-th:text-left prose-th:text-xs prose-th:font-medium prose-td:text-xs prose-hr:hidden";
 
 interface MarkdownErrorBoundaryProps {

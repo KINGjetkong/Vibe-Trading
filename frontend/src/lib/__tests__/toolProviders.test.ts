@@ -1,4 +1,4 @@
-import { providerForTool } from "@/lib/toolProviders";
+import { providerForInlineCodeToken, providerForTool } from "@/lib/toolProviders";
 import type { Feed } from "@/lib/feedHealth";
 
 const theta: Feed = {
@@ -41,5 +41,18 @@ describe("providerForTool", () => {
   it("does not badge shell or file tools", () => {
     expect(providerForTool("bash", {})).toBeNull();
     expect(providerForTool("read_file", {})).toBeNull();
+  });
+});
+
+describe("providerForInlineCodeToken", () => {
+  it("matches a complete tool or provider token case-insensitively", () => {
+    expect(providerForInlineCodeToken("MADX_DATA_STATUS", [theta])?.id).toBe(theta.id);
+    expect(providerForInlineCodeToken("thetadata", [theta])?.family).toBe("TD");
+  });
+
+  it("does not match prose or partial tool names", () => {
+    expect(providerForInlineCodeToken("Please call madx_data_status now", [theta])).toBeNull();
+    expect(providerForInlineCodeToken("madx_data", [theta])).toBeNull();
+    expect(providerForInlineCodeToken(" madx_data_status ", [theta])).toBeNull();
   });
 });

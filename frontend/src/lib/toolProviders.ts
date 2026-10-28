@@ -132,3 +132,13 @@ export function providerForTool(
   }
   return null;
 }
+
+export function providerForInlineCodeToken(token: string, feeds: Feed[] = []): ToolProvider | null {
+  const normalized = token.toLocaleLowerCase();
+  if (!normalized) return null;
+  const matchingFeed = feeds.find((feed) =>
+    [feed.id, feed.label, ...feed.toolport].some((name) => name.trim().toLocaleLowerCase() === normalized),
+  );
+  if (matchingFeed) return providerForFeed(matchingFeed);
+  return providerForTool(normalized, {}, feeds);
+}

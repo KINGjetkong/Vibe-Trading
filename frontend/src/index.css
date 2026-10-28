@@ -19,9 +19,9 @@
     --popover-foreground: 30 7.6923% 10.1961%;
 
     /* Brand accent */
-    --primary: 16.7718 100% 50.1961%;
+    --primary: 20.84 100% 58.04%;
     --primary-foreground: 30 7.6923% 10.1961%;
-    --primary-hover: 16.875 100% 43.9216%;
+    --primary-hover: 21.05 85.07% 52.55%;
 
     --muted: 60 7.6923% 94.902%;
     --muted-foreground: 30 3% 34%;
@@ -54,9 +54,9 @@
     --popover: 192 5% 65%;
     --popover-foreground: 204 14% 7%;
 
-    --primary: 16.7718 100% 50.1961%;
+    --primary: 20.84 100% 58.04%;
     --primary-foreground: 30 7.6923% 10.1961%;
-    --primary-hover: 16.875 100% 43.9216%;
+    --primary-hover: 21.05 85.07% 52.55%;
 
     --muted: 198 4% 57.6%;
     --muted-foreground: 200 12% 15%;
@@ -117,9 +117,13 @@
 }
 @media (horizontal-viewport-segments: 2) {
   .madx-duo-sidebar {
+    display: flex !important;
     width: env(viewport-segment-width 0 0);
     flex: 0 0 env(viewport-segment-width 0 0);
   }
+  .madx-phone-appbar,
+  .madx-phone-scrim,
+  .madx-phone-drawer { display: none !important; }
 }
 
 /* Streaming pulse-slide animation for the "running" bar */

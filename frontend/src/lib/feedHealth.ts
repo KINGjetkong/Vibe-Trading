@@ -46,11 +46,12 @@ export const FeedHealthContext = createContext<FeedHealthContextValue>({
   error: true,
 });
 
-export function useFeedHealth(): FeedHealthContextValue {
+export function useFeedHealth(enabled = true): FeedHealthContextValue {
   const [data, setData] = useState<FeedHealthPayload | null>(null);
   const [error, setError] = useState(true);
 
   useEffect(() => {
+    if (!enabled) return;
     let disposed = false;
     let timer: number | undefined;
     let controller: AbortController | undefined;
@@ -107,7 +108,7 @@ export function useFeedHealth(): FeedHealthContextValue {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       stop();
     };
-  }, []);
+  }, [enabled]);
 
   return { data, error };
 }
