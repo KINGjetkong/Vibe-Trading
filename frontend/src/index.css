@@ -46,23 +46,23 @@
 
   .dark {
     color-scheme: dark;
-    --background: 240 4.7619% 4.1176%;
-    --foreground: 60 7.6923% 94.902%;
-    --card: 240 5.2632% 7.451%;
-    --card-foreground: 60 7.6923% 94.902%;
+    --background: 198 4% 49.8%;
+    --foreground: 204 14% 7%;
+    --card: 192 5% 65%;
+    --card-foreground: 204 14% 7%;
 
-    --popover: 240 5.2632% 7.451%;
-    --popover-foreground: 60 7.6923% 94.902%;
+    --popover: 192 5% 65%;
+    --popover-foreground: 204 14% 7%;
 
     --primary: 16.7718 100% 50.1961%;
     --primary-foreground: 30 7.6923% 10.1961%;
-    --primary-hover: 17.8301 100% 58.4314%;
+    --primary-hover: 16.875 100% 43.9216%;
 
-    --muted: 240 5.4545% 10.7843%;
-    --muted-foreground: 30 2% 67%;
+    --muted: 198 4% 57.6%;
+    --muted-foreground: 200 12% 15%;
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 5% 15.6863%;
+    --border: 196 5% 43%;
 
     /* Semantic colors */
     --success: 142 71% 45%;
@@ -71,9 +71,9 @@
     --info: 217 91% 60%;
 
     /* Chart tokens */
-    --chart-grid: 240 5.4545% 10.7843%;
-    --chart-text: 30 2% 67%;
-    --chart-axis: 240 5% 26%;
+    --chart-grid: 198 4% 57.6%;
+    --chart-text: 200 12% 15%;
+    --chart-axis: 196 5% 38%;
     --chart-compare-a: #60a5fa;
     --chart-compare-b: #fbbf24;
   }
@@ -253,4 +253,11 @@
 .vt-bidi .katex,
 .vt-bidi .katex * {
   direction: ltr;
+}
+
+@layer base {
+  .dark ::placeholder {
+    color: hsl(var(--muted-foreground));
+    opacity: 0.85;
+  }
 }

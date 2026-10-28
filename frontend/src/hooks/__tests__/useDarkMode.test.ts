@@ -34,19 +34,19 @@ describe("useDarkMode", () => {
     mockMatchMedia(false);
   });
 
-  it("follows the light system theme when no preference is stored", () => {
+  it("defaults to light when no preference is stored", () => {
     const { result } = renderHook(() => useDarkMode());
 
     expect(result.current.dark).toBe(false);
     expect(localStorage.getItem("qa-theme")).toBeNull();
   });
 
-  it("follows the dark system theme when no preference is stored", () => {
+  it("stays light under a dark system theme when no preference is stored", () => {
     mockMatchMedia(true);
 
     const { result } = renderHook(() => useDarkMode());
 
-    expect(result.current.dark).toBe(true);
+    expect(result.current.dark).toBe(false);
     expect(localStorage.getItem("qa-theme")).toBeNull();
   });
 
@@ -89,18 +89,12 @@ describe("useDarkMode", () => {
     expect(document.documentElement.style.colorScheme).toBe("dark");
   });
 
-  it("resumes following system changes when the stored preference is removed", () => {
-    localStorage.setItem("qa-theme", "light");
+  it("ignores system theme changes", () => {
     const system = mockMatchMedia(false);
     const { result } = renderHook(() => useDarkMode());
-    localStorage.removeItem("qa-theme");
 
-    act(() => {
-      window.dispatchEvent(new StorageEvent("storage", { key: "qa-theme" }));
-      system.emit(true);
-    });
+    act(() => system.emit(true));
 
-    expect(result.current.dark).toBe(true);
-    expect(localStorage.getItem("qa-theme")).toBeNull();
+    expect(result.current.dark).toBe(false);
   });
 });

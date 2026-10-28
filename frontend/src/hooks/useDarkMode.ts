@@ -4,20 +4,10 @@ import { publishThemeChange } from "@/lib/theme-store";
 
 const STORAGE_KEY = "qa-theme";
 
-function getSystemPreference(): boolean {
-  if (typeof window.matchMedia !== "function") return false;
-  try {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  } catch {
-    return false;
-  }
-}
-
 function getPreferredTheme(): boolean {
   const saved = safeGet(STORAGE_KEY);
   if (saved === "dark") return true;
-  if (saved === "light") return false;
-  return getSystemPreference();
+  return false;
 }
 
 export function useDarkMode() {
@@ -45,27 +35,7 @@ export function useDarkMode() {
     };
     window.addEventListener("storage", onStorage);
 
-    if (typeof window.matchMedia !== "function") {
-      return () => window.removeEventListener("storage", onStorage);
-    }
-
-    let mediaQuery: MediaQueryList;
-    try {
-      mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    } catch {
-      return () => window.removeEventListener("storage", onStorage);
-    }
-
-    const onSystemChange = (event: MediaQueryListEvent) => {
-      if (safeGet(STORAGE_KEY) !== null) return;
-      syncTheme(event.matches);
-    };
-    mediaQuery.addEventListener("change", onSystemChange);
-
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      mediaQuery.removeEventListener("change", onSystemChange);
-    };
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   const toggle = useCallback(() => {
