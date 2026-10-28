@@ -210,9 +210,24 @@ export function Layout() {
             aria-label="MadTrader · MADX SIGMA6"
             className={cn("flex items-center", collapsed ? "justify-center" : "gap-2 max-md:justify-center")}
           >
-            <img className="h-6 w-6 shrink-0" src="http://127.0.0.1:7790/_madx/madx-mark.svg" alt="" />
+            <span className="madx-brand-identity">
+              <img className="h-6 w-6 shrink-0" src="http://127.0.0.1:7790/_madx/madx-mark.svg?v=gemini-20261028" alt="" />
+              <svg className="madx-brand-sparkle" viewBox="0 0 24 20" aria-hidden="true">
+                <defs>
+                  <linearGradient id="madx-header-spectrum" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#4285f4" />
+                    <stop offset="25%" stopColor="#9b72cb" />
+                    <stop offset="45%" stopColor="#d96570" />
+                    <stop offset="65%" stopColor="#f4b400" />
+                    <stop offset="82%" stopColor="#0f9d58" />
+                    <stop offset="100%" stopColor="#4285f4" />
+                  </linearGradient>
+                </defs>
+                <path d="M12 1.5c1.2 5.8 2.7 7.3 8.5 8.5-5.8 1.2-7.3 2.7-8.5 8.5-1.2-5.8-2.7-7.3-8.5-8.5 5.8-1.2 7.3-2.7 8.5-8.5Z" fill="url(#madx-header-spectrum)" />
+              </svg>
+            </span>
             {!collapsed && (
-              <span className="text-[15px] font-semibold tracking-tight max-md:hidden">MadTrader · MADX SIGMA6</span>
+              <span className="text-[15px] font-semibold tracking-tight max-md:hidden">MadTrader · <span className="madx-wordmark">MADX</span> SIGMA6</span>
             )}
           </Link>
         </div>

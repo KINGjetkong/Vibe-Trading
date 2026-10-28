@@ -2055,6 +2055,30 @@ Run any CLI command — tools from ordinary external servers are automatically i
 vibe-trading run "use my-server to do X"
 ```
 
+### MADX Suite Tool Port
+
+The MadTrader agent can load the local, watch-only Suite Tool Port using the
+operator-managed `~/.vibe-trading/agent.json` config:
+
+```json
+{
+  "mcpServers": {
+    "suite": {
+      "type": "streamableHttp",
+      "url": "http://127.0.0.1:7790/mcp",
+      "enabledTools": ["*"]
+    }
+  }
+}
+```
+
+The agent reads this file through its normal `agent_config` loader. Tool names
+in the Vibe registry use the documented MCP prefix:
+`mcp_suite_<tool_port_name>` (for example, `mcp_suite_madx_suite`,
+`mcp_suite_cover_library`, and `mcp_suite_feed_health`). Restart the agent
+service only when its runtime does not reload the config between turns. The
+Suite `madx_suite` action itself is restricted to its research/report allowlist.
+
 ### Official IBKR MCP read-only probe
 
 Vibe-Trading can connect directly to Interactive Brokers' official remote MCP

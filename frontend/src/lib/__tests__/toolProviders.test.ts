@@ -38,6 +38,14 @@ describe("providerForTool", () => {
     });
   });
 
+  it("maps MADX Suite Tool Port to the MX badge", () => {
+    expect(providerForTool("madx_suite", {})).toMatchObject({
+      label: "Tool Port",
+      family: "MX",
+    });
+    expect(providerForTool("mcp_suite_madx_suite", {})?.family).toBe("MX");
+  });
+
   it("does not badge shell or file tools", () => {
     expect(providerForTool("bash", {})).toBeNull();
     expect(providerForTool("read_file", {})).toBeNull();

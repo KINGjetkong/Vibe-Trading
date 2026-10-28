@@ -28,6 +28,7 @@ const FAMILY_COLORS: Record<string, string> = {
   AG: "bg-violet-800",
   BR: "bg-slate-600",
   TP: "bg-slate-700",
+  MX: "bg-violet-700",
   TJ: "bg-amber-800",
   ES: "bg-lime-800",
   MT: "bg-indigo-800",
@@ -120,6 +121,9 @@ export function providerForTool(
 
   if (["web_search", "read_url"].includes(tool) || ["web_search", "read_url"].includes(normalizedTool)) {
     return providerForFamily("WEB", "Web", feeds);
+  }
+  if (tool === "madx_suite" || normalizedTool === "madx_suite") {
+    return providerForFamily("MX", "Tool Port", feeds);
   }
   if (tool === "backtest" || tool.startsWith("backtest_") || normalizedTool === "backtest") {
     return providerForFamily("BT", "Backtest engine", feeds);

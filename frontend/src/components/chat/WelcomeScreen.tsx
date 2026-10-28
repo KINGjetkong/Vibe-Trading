@@ -248,7 +248,9 @@ export function WelcomeScreen({ onExample }: Props) {
       <div className="w-full max-w-3xl">
         <div className="mx-auto max-w-2xl">
           <div className="flex items-center justify-center gap-3">
-            <BrandMark className="h-9 w-9 shrink-0" />
+            <span className="madx-brand-identity madx-hero-brand-identity">
+              <BrandMark className="h-9 w-9 shrink-0" />
+            </span>
             <h1 className="font-serif text-[34px] font-normal leading-tight sm:text-[40px]">
               {t(greetingKey as any)}
             </h1>
