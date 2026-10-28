@@ -1,8 +1,11 @@
-import { memo, useEffect, useMemo, useRef, type JSX } from "react";
+import { memo, useContext, useEffect, useMemo, useRef, type JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { ProgressBar } from "@/components/chat/ProgressBar";
+import { ProviderBadge } from "@/components/chat/ProviderBadge";
+import { FeedHealthContext } from "@/lib/feedHealth";
 import { localizeToolName } from "@/lib/tools";
+import { providerForTool } from "@/lib/toolProviders";
 import type { ToolCallEntry } from "@/types/agent";
 
 /* ---------- ETA tracking (per-tool) ---------- */
@@ -127,7 +130,13 @@ interface RowProps {
 
 function ToolRow({ entries, eta }: RowProps): JSX.Element {
   const { t } = useTranslation();
+  const { data } = useContext(FeedHealthContext);
   const entry = entries[entries.length - 1];
+  const feeds = data?.feeds ?? [];
+  const provider = providerForTool(entry.tool, entry.arguments, feeds);
+  const matchedFeed = provider
+    ? feeds.find((feed) => feed.id === provider.id || feed.family === provider.family)
+    : undefined;
   const progress = entries.length === 1 ? entry.progress : undefined;
   const hasDeterminate = !!(progress && typeof progress.current === "number" && typeof progress.total === "number" && progress.total > 0);
   const stage = progress?.stage || "";
@@ -156,6 +165,7 @@ function ToolRow({ entries, eta }: RowProps): JSX.Element {
       {/* Primary row */}
       <div className="flex items-center gap-2 min-w-0">
         {icon}
+        {provider && <ProviderBadge provider={provider} feed={matchedFeed} />}
         <span className="text-foreground shrink-0">
           {localized}
           {entries.length > 1 && (

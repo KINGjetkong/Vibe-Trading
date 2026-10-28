@@ -1240,6 +1240,29 @@
     "failedToResumeConnector": "Connector konnte nicht fortgesetzt werden.",
     "tokenUsage": {
       "live": "Tokens"
+    },
+    "feedHealth": {
+      "title": "Feed health",
+      "unknown": "Feeds unknown",
+      "summary": "Feeds: {{online}} online · {{stale}} stale · {{down}} down · WS {{connected}}/{{configured}}",
+      "websockets": "WS {{connected}}/{{configured}}",
+      "asOf": "as of {{time}}",
+      "notChecked": "not checked",
+      "secondsAgo": "{{count}}s ago",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "states": {
+        "online": "online",
+        "stale": "stale",
+        "down": "down",
+        "unchecked": "unchecked"
+      },
+      "kinds": {
+        "services": "Services",
+        "dataApis": "Data APIs",
+        "brokers": "Brokers",
+        "websockets": "WebSockets"
+      }
     }
   },
   "runDetail": {

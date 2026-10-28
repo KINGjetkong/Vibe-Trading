@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { ToolProgressIndicator } from "../ToolProgressIndicator";
 import type { ToolCallEntry } from "@/types/agent";
+import { FeedHealthContext, type FeedHealthPayload } from "@/lib/feedHealth";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -44,6 +45,29 @@ describe("ToolProgressIndicator", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(screen.getByText(/Run the backtest/)).toBeInTheDocument();
     expect(screen.getByText("5s")).toBeInTheDocument();
+  });
+
+  it("shows provider badges for mapped APIs but not shell tools", () => {
+    const data: FeedHealthPayload = {
+      ok: true,
+      ts_utc: "2026-10-27T20:00:00Z",
+      ts_et: "Oct 27, 04:00:00 PM ET",
+      counts: { online: 1, stale: 0, down: 0, unchecked: 0 },
+      websockets: { connected: 0, configured: 1 },
+      feeds: [],
+      rule: "green = verified; yellow = stale; red = down; grey = unchecked",
+    };
+    render(
+      <FeedHealthContext.Provider value={{ data, error: false }}>
+        <ToolProgressIndicator toolCalls={[
+          makeTc({ tool: "get_market_data", arguments: { source: "yfinance" } }),
+          makeTc({ id: "tc-bash", tool: "bash" }),
+        ]} />
+      </FeedHealthContext.Provider>,
+    );
+
+    expect(screen.getByRole("img", { name: /Yahoo Finance · unknown/ })).toBeInTheDocument();
+    expect(screen.getAllByRole("img")).toHaveLength(1);
   });
 
   it("uses the shared elapsed format for persisted completed steps", () => {
